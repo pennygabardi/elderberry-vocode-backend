@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Talk to Me (Browser)</title>
+</head>
+<body>
+  <h1>Talk to Elderberry (Beta)</h1>
+  <button onclick="startRecording()">Start Talking</button>
+  <p id="transcript"></p>
+  <script>
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      const audioChunks = [];
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const res = await fetch("https://api.deepgram.com/v1/listen", {
+          method: "POST",
+          headers: {
+            "Authorization": "Token your_deepgram_api_key_here"
+          },
+          body: audioBlob
+        });
+
+        const data = await res.json();
+        document.getElementById("transcript").innerText = data?.results?.channels[0]?.alternatives[0]?.transcript || "No transcript";
+      };
+
+      mediaRecorder.start();
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+      }, 5000); // Record for 5 seconds
+    }
+  </script>
+</body>
+</html>
