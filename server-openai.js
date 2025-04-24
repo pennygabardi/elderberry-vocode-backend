@@ -4,18 +4,17 @@ const WebSocket = require("ws");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai"); // ✅ Correct SDK v4 import
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 10000;
 
-// Set up OpenAI API
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+// ✅ Correct OpenAI SDK v4 client initialization
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 
 // Serve static files from /public
 app.use(express.static("public"));
