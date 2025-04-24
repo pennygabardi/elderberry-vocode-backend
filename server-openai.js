@@ -34,15 +34,15 @@ wss.on("connection", (ws) => {
       if (data.type === "start") {
         const prompt = data.message || "Tell me a story about a wise elder.";
 
-        const response = await openai.createChatCompletion({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: prompt }],
-        });
+      const completion = await openai.chat.completions.create({
+  model: "gpt-3.5-turbo",
+  messages: [{ role: "user", content: data.message }],
+});
 
-        const reply = response.data.choices[0].message.content;
-        console.log("💬 OpenAI says:", reply);
+        const reply = completion.choices[0].message.content;
+console.log("🧠 GPT-3.5 says:", reply);
 
-        ws.send(JSON.stringify({ transcript: reply }));
+ws.send(JSON.stringify({ transcript: `Elderberry says: ${reply}` }));
       }
     } catch (err) {
       console.error("❌ Error handling message:", err);
